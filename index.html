@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>where's d</title>
 </head>
@@ -8,6 +9,18 @@
     <div>where's d</div>
     <div id="content">hello world</div>
     <script>
+        async function loadJsonData() {
+            try {
+                const response = await fetch('data.json');
+                const data = await response.json();
+                console.log(data);
+            } catch (error) {
+                console.error('Error fetching JSON:', error);
+            }
+        }
+
+        // Call the function when the DOM is ready
+        document.addEventListener('DOMContentLoaded', loadJsonData);
     </script>
 </body>
 
