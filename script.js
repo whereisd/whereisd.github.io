@@ -17,8 +17,9 @@ L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
 }).addTo(map);
 
 const marker = L.marker([0, 0]).addTo(map);
+marker.setStyle({ fillColor: 'orange', color: 'green' });
 marker.bindTooltip(
-  `<img src="./assets/logo.png" alt="logo" style="width:5rem;" /> <br/> d is here!`
+  `<img src="./hikingd.png" alt="logo" style="width:5rem;" /> <br/> d is here!`
 );
 
 async function loadJsonData() {
