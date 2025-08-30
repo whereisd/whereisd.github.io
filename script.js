@@ -11,12 +11,12 @@ map.setView([0, 0], 15);
 //   attribution: "© OpenStreetMap & CartoDB contributors",
 // }).addTo(map);
 
-L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
-        maxZoom: 20,
-        subdomains:['mt0','mt1','mt2','mt3']
+L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+    maxZoom: 20,
+    subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
 }).addTo(map);
 
-const info = L.control({position: 'topright'});
+const info = L.control({ position: 'topright' });
 
 info.onAdd = function (map) {
     this._div = L.DomUtil.create('div', 'info-box');
@@ -35,15 +35,17 @@ const markerIcon = L.icon({
 
 const marker = L.marker([0, 0], { icon: markerIcon }).addTo(map);
 marker.bindTooltip(
-  `d is here!`
+    `d is here!`
 );
 
 async function loadJsonData() {
-  try {
-    const response = await fetch('data.js', {cache: 'no-store'});
-    const data = await response.json();
-    marker.setLatLng([data.lat, data.lng]);
-    map.setView([data.lat, data.lng], 15);
+    try {
+        const response = await fetch('data.js', { cache: 'no-store' });
+        const data = await response.json();
+        marker.setLatLng([data.lat, data.lng]);
+        map.setView([data.lat, data.lng], 15);
+
+        document.getElementById("last-date-time").setInnerText(data.dt);
     } catch (error) {
         console.error('Error fetching JSON:', error);
     }
