@@ -45,7 +45,7 @@ async function loadJsonData() {
         marker.setLatLng([data.lat, data.lng]);
         map.setView([data.lat, data.lng], 15);
 
-        document.getElementById("last-date-time").setInnerText(data.dt);
+        document.getElementById("last-date-time").innerText = data.dt;
     } catch (error) {
         console.error('Error fetching JSON:', error);
     }
