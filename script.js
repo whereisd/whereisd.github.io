@@ -7,9 +7,14 @@ map.setView([0, 0], 15);
 // }).addTo(map);
 
 // *******another tile provider*******
-L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-  attribution: "© OpenStreetMap & CartoDB contributors",
-}).addTo(map);
+// L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+//   attribution: "© OpenStreetMap & CartoDB contributors",
+// }).addTo(map);
+
+L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
+        maxZoom: 20,
+        subdomains:['mt0','mt1','mt2','mt3']
+});
 
 const marker = L.marker([0, 0]).addTo(map);
 marker.bindTooltip(
