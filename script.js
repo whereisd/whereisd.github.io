@@ -20,7 +20,7 @@ const info = L.control({ position: 'topright' });
 
 info.onAdd = function (map) {
     this._div = L.DomUtil.create('div', 'info-box');
-    this._div.innerHTML = '<h3>Last known location</h3><h4 id="last-date-time"></h4>';
+    this._div.innerHTML = '<h2>Last known location</h2><h4 id="last-date-time"></h4>';
     return this._div;
 };
 
@@ -49,7 +49,7 @@ async function loadJsonData() {
         const utcDateString = data.dt.replace(/\(|\)/g, "");
         const utcDate = new Date(utcDateString);
         const localTimeString = utcDate.toLocaleString();
-        document.getElementById("last-date-time").innerText = localTimeString;
+        document.getElementById("last-date-time").innerText = "(" + localTimeString + ")";
     } catch (error) {
         console.error('Error fetching JSON:', error);
     }
@@ -57,3 +57,7 @@ async function loadJsonData() {
 
 
 document.addEventListener('DOMContentLoaded', loadJsonData);
+
+setTimeout(function() {
+  location.reload();
+}, 5*60*1000); //auto-refresh after 5 mins
