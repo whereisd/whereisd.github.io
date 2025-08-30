@@ -18,8 +18,8 @@ L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
 
 var markerIcon = L.icon({
     iconUrl: './hikingd.png',
-    iconSize: [38, 63],
-    iconAnchor: [22, 94],
+    iconSize: [45, 72],
+    iconAnchor: [10, 44],
     popupAnchor: [-3, -76]
 });
 
