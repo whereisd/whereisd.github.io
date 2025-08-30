@@ -45,7 +45,9 @@ async function loadJsonData() {
         marker.setLatLng([data.lat, data.lng]);
         map.setView([data.lat, data.lng], 15);
 
-        const utcDate = new Date(data.dt);
+        // Need to remove the "()" around "(UTC)"...
+        const utcDateString = data.dt.replace(/\(|\)/g, "");
+        const utcDate = new Date(utcDateString);
         const localTimeString = utcDate.toLocaleString();
         document.getElementById("last-date-time").innerText = localTimeString;
     } catch (error) {
