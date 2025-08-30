@@ -1,0 +1,31 @@
+
+const map = L.map("map");
+map.setView([0, 0], 15);
+
+// L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+//   attribution: "© OpenStreetMap contributors",
+// }).addTo(map);
+
+// *******another tile provider*******
+L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+  attribution: "© OpenStreetMap & CartoDB contributors",
+}).addTo(map);
+
+const marker = L.marker([0, 0]).addTo(map);
+marker.bindTooltip(
+  `<img src="./assets/logo.png" alt="logo" style="width:5rem;" /> <br/> d is here!`
+);
+
+async function loadJsonData() {
+  try {
+    const response = await fetch('data.js', {cache: 'no-store'});
+    const data = await response.json();
+    marker.setLatLng([data.lat, data.lng]);
+    map.setView([data.lat, data.lng], 15);
+    } catch (error) {
+        console.error('Error fetching JSON:', error);
+    }
+}
+
+
+document.addEventListener('DOMContentLoaded', loadJsonData);
