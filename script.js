@@ -16,7 +16,17 @@ L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
         subdomains:['mt0','mt1','mt2','mt3']
 }).addTo(map);
 
-var markerIcon = L.icon({
+const info = L.control({position: 'topright'});
+
+info.onAdd = function (map) {
+    this._div = L.DomUtil.create('div', 'info-box');
+    this._div.innerHTML = '<h4>Last known location</h4><p id="last-date-time"></p>';
+    return this._div;
+};
+
+info.addTo(map);
+
+const markerIcon = L.icon({
     iconUrl: './hikingd.png',
     iconSize: [45, 72],
     iconAnchor: [10, 44],
@@ -24,7 +34,6 @@ var markerIcon = L.icon({
 });
 
 const marker = L.marker([0, 0], { icon: markerIcon }).addTo(map);
-// marker.setStyle({ fillColor: 'orange', color: 'green' });
 marker.bindTooltip(
   `d is here!`
 );
