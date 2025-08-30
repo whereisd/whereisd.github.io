@@ -16,10 +16,17 @@ L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
         subdomains:['mt0','mt1','mt2','mt3']
 }).addTo(map);
 
-const marker = L.marker([0, 0]).addTo(map);
+var markerIcon = L.icon({
+    iconUrl: './hikingd.png',
+    iconSize: [38, 95],
+    iconAnchor: [22, 94],
+    popupAnchor: [-3, -76]
+});
+
+const marker = L.marker([0, 0], { icon: markerIcon }).addTo(map);
 // marker.setStyle({ fillColor: 'orange', color: 'green' });
 marker.bindTooltip(
-  `<img src="./hikingd.png" alt="logo" style="width:5rem;" /> <br/> d is here!`
+  `d is here!`
 );
 
 async function loadJsonData() {
