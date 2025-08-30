@@ -43,7 +43,12 @@ async function loadJsonData() {
         const response = await fetch('data.js', { cache: 'no-store' });
         const data = await response.json();
         marker.setLatLng([data.lat, data.lng]);
-        map.setView([data.lat, data.lng], 15);
+        map.setView([data.lat, data.lng], map.getZoom(), {
+            animate: true,
+            pan: {
+                duration: 2
+            }
+        });
 
         // Need to remove the "()" around "(UTC)"...
         const utcDateString = data.dt.replace(/\(|\)/g, "");
