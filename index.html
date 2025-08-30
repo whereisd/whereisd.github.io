@@ -11,13 +11,7 @@
     <script>
         async function loadJsonData() {
             try {
-                const response = await fetch('data.json', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ key: 'value' })
-                });
+                const response = await fetch('data.js');
                 const data = await response.json();
                 console.log(data);
             } catch (error) {
