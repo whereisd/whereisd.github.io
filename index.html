@@ -10,7 +10,7 @@
     <script>
         async function loadJsonData() {
             try {
-                const response = await fetch('data.js');
+                const response = await fetch('data.js', {cache: 'no-store'});
                 const data = await response.json();
                 document.getElementById("content").innerText = `Latitude: ${data.lat}, Longitude: ${data.lng}`;
             } catch (error) {
