@@ -55,9 +55,8 @@ async function loadJsonData() {
     }
 }
 
-
+//initial data load
 document.addEventListener('DOMContentLoaded', loadJsonData);
 
-setTimeout(function() {
-  location.reload();
-}, 5*60*1000); //auto-refresh after 5 mins
+//auto-refresh after 1 min
+setInterval(() => {loadJsonData()}, 60*1000);
