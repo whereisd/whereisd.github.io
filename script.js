@@ -1,4 +1,4 @@
-
+var firstLoad = true;
 const map = L.map("map");
 map.setView([0, 0], 15);
 
@@ -39,9 +39,10 @@ async function loadJsonData() {
         const response = await fetch('data.js', { cache: 'no-store' });
         const data = await response.json();
 
-        //only update marker and view if location has changed...
+        //only update marker and view if first load or location has changed...
         const currLatLng = marker.getLatLng();
-        if ((currLatLng.lat != data.lat) || (currLatLng.lng != data.lng)) {
+        if ((firstLoad) || (currLatLng.lat != data.lat) || (currLatLng.lng != data.lng)) {
+            firstLoad = false;
             marker.setLatLng([data.lat, data.lng]);
             map.setView([data.lat, data.lng], map.getZoom(), {
                 animate: true,
