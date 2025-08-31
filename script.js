@@ -20,7 +20,7 @@ const info = L.control({ position: 'topright' });
 
 info.onAdd = function (map) {
     this._div = L.DomUtil.create('div', 'info-box');
-    this._div.innerHTML = '<h2>Last known location</h2><h4 id="last-date-time"></h4><div>Checking for update in <span id="next-update-countdown">5:00</span></div>';
+    this._div.innerHTML = '<h2>Last known location</h2><h4 id="last-date-time" style="margin-bottom: 2px"></h4><div>Checking for update in <span id="next-update-countdown">5:00</span></div>';
     return this._div;
 };
 
