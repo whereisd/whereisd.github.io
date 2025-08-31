@@ -20,7 +20,7 @@ const info = L.control({ position: 'topright' });
 
 info.onAdd = function (map) {
     this._div = L.DomUtil.create('div', 'info-box');
-    this._div.innerHTML = '<h2>Last known location</h2><h4 id="last-date-time"></h4>';
+    this._div.innerHTML = '<h2>Last known location</h2><h4 id="last-date-time"></h4><div>Checking for update in <span id="next-update-countdown">5:00</span></div>';
     return this._div;
 };
 
@@ -62,8 +62,44 @@ async function loadJsonData() {
     }
 }
 
+// Set the initial countdown time in seconds (e.g., 5 minutes = 300 seconds)
+let totalSeconds = 300; 
+
+// Get the HTML element where the timer will be displayed
+const timerDisplay = document.getElementById('next-update-countdown'); 
+
+function updateCountdown() {
+    // Calculate minutes and seconds
+    let minutes = Math.floor(totalSeconds / 60);
+    let seconds = totalSeconds % 60;
+
+    // Format minutes and seconds to always have two digits
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+    seconds = seconds < 10 ? '0' + seconds : seconds;
+
+    // Display the formatted time
+    timerDisplay.textContent = `${minutes}:${seconds}`;
+
+    // Decrease the total seconds
+    totalSeconds--;
+
+    // Stop the timer when it reaches zero
+    if (totalSeconds < 0) {
+        clearInterval(countdownInterval); // Stop the interval
+        timerDisplay.textContent = "";
+        // Reset the countdown for the next cycle
+        totalSeconds = 300; 
+        loadJsonData(); // Fetch new data
+        // Restart the countdown
+        countdownInterval = setInterval(updateCountdown, 1000);
+    }
+}
+
+// Call updateCountdown initially to display the starting time
+updateCountdown(); 
+
+// Set up the interval to call updateCountdown every second
+let countdownInterval = setInterval(updateCountdown, 1000); 
+
 //initial data load
 document.addEventListener('DOMContentLoaded', loadJsonData);
-
-//auto-refresh every 5 mins
-setInterval(() => {loadJsonData()}, 5*60*1000);
