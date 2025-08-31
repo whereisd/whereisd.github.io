@@ -29,26 +29,27 @@ info.addTo(map);
 const markerIcon = L.icon({
     iconUrl: './hikingd.png',
     iconSize: [100, 100],
-    iconAnchor: [0, 25],
-    popupAnchor: [0, 0]
+    iconAnchor: [0, 25]
 });
 
 const marker = L.marker([0, 0], { icon: markerIcon }).addTo(map);
-marker.bindTooltip(
-    `d is here!`
-);
 
 async function loadJsonData() {
     try {
         const response = await fetch('data.js', { cache: 'no-store' });
         const data = await response.json();
-        marker.setLatLng([data.lat, data.lng]);
-        map.setView([data.lat, data.lng], map.getZoom(), {
-            animate: true,
-            pan: {
-                duration: 2
-            }
-        });
+
+        //only update marker and view if location has changed...
+        const currLatLng = marker.getLatLng();
+        if ((currLatLng.lat != data.lat) || (currLatLng.lng != data.lng)) {
+            marker.setLatLng([data.lat, data.lng]);
+            map.setView([data.lat, data.lng], map.getZoom(), {
+                animate: true,
+                pan: {
+                    duration: 2
+                }
+            });
+        }
 
         // Need to remove the "()" around "(UTC)"...
         const utcDateString = data.dt.replace(/\(|\)/g, "");
