@@ -28,9 +28,9 @@ info.addTo(map);
 
 const markerIcon = L.icon({
     iconUrl: './hikingd.png',
-    iconSize: [45, 72],
-    iconAnchor: [10, 44],
-    popupAnchor: [-3, -76]
+    iconSize: [100, 100],
+    iconAnchor: [0, 25],
+    popupAnchor: [0, 0]
 });
 
 const marker = L.marker([0, 0], { icon: markerIcon }).addTo(map);
