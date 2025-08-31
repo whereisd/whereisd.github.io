@@ -64,5 +64,5 @@ async function loadJsonData() {
 //initial data load
 document.addEventListener('DOMContentLoaded', loadJsonData);
 
-//auto-refresh after 1 min
-setInterval(() => {loadJsonData()}, 60*1000);
+//auto-refresh every 5 mins
+setInterval(() => {loadJsonData()}, 5*60*1000);
