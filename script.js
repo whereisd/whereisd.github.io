@@ -1,6 +1,6 @@
 var firstLoad = true;
 const map = L.map("map");
-map.setView([0, 0], 10);
+map.setView([0, 0], 17);
 
 // L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 //   attribution: "© OpenStreetMap contributors",
