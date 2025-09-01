@@ -21,13 +21,13 @@ map.setView([0, 0], 17);
 // var USGS_USTopo = L.tileLayer('https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}', {
 // 	maxZoom: 20,
 // 	attribution: 'Tiles courtesy of the <a href="https://usgs.gov/">U.S. Geological Survey</a>'
-// });
+// }).addTo(map);
 
-// *****
+// *****OpenStreetMap Standard *****
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 	maxZoom: 19,
 	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-});
+}).addTo(map);
 
 const info = L.control({ position: 'topright' });
 
