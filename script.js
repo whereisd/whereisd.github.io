@@ -50,14 +50,15 @@ const marker = L.marker([0, 0], { icon: markerIcon }).addTo(map);
 async function loadJsonData() {
     try {
         const response = await fetch('data.js', { cache: 'no-store' });
-        const data = await response.json();
+        const allData = await response.json();
+        const currentData = allData[allData.length - 1];
 
         //only update marker and view if first load or location has changed...
         const currLatLng = marker.getLatLng();
-        if ((firstLoad) || (currLatLng.lat != data.lat) || (currLatLng.lng != data.lng)) {
+        if ((firstLoad) || (currLatLng.lat != currentData.lat) || (currLatLng.lng != currentData.lng)) {
             firstLoad = false;
-            marker.setLatLng([data.lat, data.lng]);
-            map.setView([data.lat, data.lng], map.getZoom(), {
+            marker.setLatLng([currentData.lat, currentData.lng]);
+            map.setView([currentData.lat, currentData.lng], map.getZoom(), {
                 animate: true,
                 pan: {
                     duration: 2
@@ -66,7 +67,7 @@ async function loadJsonData() {
         }
 
         // Need to remove the "()" around "(UTC)"...
-        const utcDateString = data.dt.replace(/\(|\)/g, "");
+        const utcDateString = currentData.dt.replace(/\(|\)/g, "");
         const utcDate = new Date(utcDateString);
         const localTimeString = utcDate.toLocaleString();
         document.getElementById("last-date-time").innerText = "(" + localTimeString + ")";
