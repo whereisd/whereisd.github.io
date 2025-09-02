@@ -56,10 +56,10 @@ async function loadJsonData() {
             //Add the previous locations as markers...
             for (let i = 0; i < allData.length - 1; i++) {
                 const dataPoint = allData[i];
-                let ptMarker = L.marker([dataPoint.lat, dataPoint.lng], { icon: L.divIcon({html: '<h1>' + (i + 1) + '</h1>'}) }).addTo(map);
+                let ptMarker = L.marker([dataPoint.lat, dataPoint.lng], { icon: L.divIcon({html: `<h1>${(i + 1)}</h1>`}) }).addTo(map);
                 const utcDate = new Date(dataPoint.dt);
                 const localTimeString = utcDate.toLocaleString();
-                ptMarker.bindTooltip(`<b>${localTimeString}</b>`);
+                ptMarker.bindTooltip(`<b>${localTimeString}</b><br>Elevation: ${Math.round(dataPoint.el)}`);
             }
             // Create a polyline from all locations...
             const latlngs = allData.slice().map(dataPoint => [dataPoint.lat, dataPoint.lng]);
