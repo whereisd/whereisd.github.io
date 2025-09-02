@@ -81,7 +81,7 @@ async function loadJsonData() {
         if ((firstLoad) || (markerLocation.lat != currentData.lat) || (markerLocation.lng != currentData.lng)) {
             firstLoad = false;
             dMarker.setLatLng([currentData.lat, currentData.lng]);
-            dMarker.bindTooltip(`<b>${localTimeString}</b>`);
+            dMarker.bindTooltip(`<b>${localTimeString}</b><br>Elevation: ${Math.round(currentData.el)}`);
             map.setView([currentData.lat, currentData.lng], map.getZoom(), {
                 animate: true,
                 pan: {
