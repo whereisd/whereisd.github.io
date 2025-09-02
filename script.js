@@ -53,14 +53,14 @@ async function loadJsonData() {
         const allData = await response.json();
 
         if(firstLoad) {
-            //Add the previous locations as a polyline...
-            const latlngs = allData.map(dataPoint => [dataPoint.lat, dataPoint.lng]);
-            if (latlngs.length > 1) {
-                const polyline = L.polyline(latlngs, { color: 'blue' }).addTo(map);
-                // Zoom the map to the polyline
-                map.fitBounds(polyline.getBounds());
+
+            //Add the previous locations as markers...
+            for (let i = 0; i < allData.length - 1; i++) {
+                const dataPoint = allData[i];
+                L.marker([dataPoint.lat, dataPoint.lng], { icon: L.divIcon({html: '<h1>' + (i + 1) + '</h1>'}) }).addTo(map);
             }
         }
+        
         //get the most recent data point...
         const currentData = allData[allData.length - 1];
 
