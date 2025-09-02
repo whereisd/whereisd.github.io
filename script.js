@@ -56,7 +56,7 @@ async function loadJsonData() {
             //Add the previous locations as markers...
             for (let i = 0; i < allData.length - 1; i++) {
                 const dataPoint = allData[i];
-                console.log{JSON.stringify(dataPoint)};
+                console.log(JSON.stringify(dataPoint));
                 //L.marker([dataPoint.lat, dataPoint.lng], { icon: L.divIcon({html: '<h1>' + (i + 1) + '</h1>'}) }).addTo(map);
             }
         }
