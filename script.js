@@ -54,8 +54,8 @@ async function loadJsonData() {
         const currentData = allData[allData.length - 1];
 
         //only update marker and view if first load or location has changed...
-        const currLatLng = marker.getLatLng();
-        if ((firstLoad) || (currLatLng.lat != currentData.lat) || (currLatLng.lng != currentData.lng)) {
+        const markerLocation = marker.getLatLng();
+        if ((firstLoad) || (markerLocation.lat != currentData.lat) || (markerLocation.lng != currentData.lng)) {
             firstLoad = false;
             marker.setLatLng([currentData.lat, currentData.lng]);
             map.setView([currentData.lat, currentData.lng], map.getZoom(), {
@@ -65,10 +65,8 @@ async function loadJsonData() {
                 }
             });
         }
-
-        // Need to remove the "()" around "(UTC)"...
-        const utcDateString = currentData.dt.replace(/\(|\)/g, "");
-        const utcDate = new Date(utcDateString);
+   
+        const utcDate = new Date(currentData.dt);
         const localTimeString = utcDate.toLocaleString();
         document.getElementById("last-date-time").innerText = "(" + localTimeString + ")";
     } catch (error) {
