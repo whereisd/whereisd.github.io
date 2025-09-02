@@ -58,8 +58,15 @@ async function loadJsonData() {
     try {
         const response = await fetch('data.js', { cache: 'no-store' });
         const allData = await response.json();
+        
         //get the most recent data point...
         const currentData = allData[allData.length - 1];
+
+        //update the date/time display...
+        const utcDate = new Date(currentData.dt);
+        const localTimeString = utcDate.toLocaleString();
+        document.getElementById("last-date-time").innerText = "(" + localTimeString + ")";
+        
         //only update markers and view if first load or location has changed...
         if ((dMarker.getLatLng().lat != currentData.lat) || (dMarker.getLatLng().lng != currentData.lng)) {
             //clear markers and polylines...
@@ -95,11 +102,6 @@ async function loadJsonData() {
             const latlngs = allData.slice().map(dataPoint => [dataPoint.lat, dataPoint.lng]);
             const polyline = L.polyline(latlngs, { color: '#f60' }).addTo(map);
         }
-        
-        //update the date/time display...
-        const utcDate = new Date(currentData.dt);
-        const localTimeString = utcDate.toLocaleString();
-        document.getElementById("last-date-time").innerText = "(" + localTimeString + ")";
     } catch (error) {
         console.error('Error fetching JSON:', error);
     }
