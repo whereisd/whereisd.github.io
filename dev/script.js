@@ -34,7 +34,7 @@ L.tileLayer('https://api.mapbox.com/styles/v1/whereisd/cmf2t86hy00to01rk5gllbu6r
 	maxZoom: 19,
 	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://www.mapbox.com/about/maps/">Mapbox</a> <strong><a href="https://labs.mapbox.com/contribute/" target="_blank">Improve this map</a></strong>'
 }).addTo(map);
-map.resize();
+
 const info = L.control({ position: 'topright' });
 
 info.onAdd = function (map) {
