@@ -143,7 +143,7 @@ function updateCountdown() {
 function drawRoute(allData) {
     if (allData.length < 2) return; // Need at least two points to draw a route
 
-    const allPoints = allData.slice().map(dataPoint => [dataPoint.lat, dataPoint.lng]);
+    const allPoints = allData.slice().map(dataPoint => [dataPoint.lng, dataPoint.lat]);
 
     // Mapbox Directions API limits the number of waypoints in a single request to 25, so chunk the requests...
     chunkedPoints = chunkArray(allPoints, 25);
