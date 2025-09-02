@@ -45,7 +45,7 @@ const markerIcon = L.icon({
     iconAnchor: [50, 50]
 });
 
-const marker = L.marker([0, 0], { icon: markerIcon }).addTo(map);
+const dMarker = L.marker([0, 0], { icon: markerIcon }).addTo(map);
 
 async function loadJsonData() {
     try {
@@ -61,8 +61,8 @@ async function loadJsonData() {
                 const localTimeString = utcDate.toLocaleString();
                 ptMarker.bindTooltip(`<b>${localTimeString}</b>`);
             }
-            // Create a polyline from the previous locations...
-            const latlngs = allData.slice(0, -1).map(dataPoint => [dataPoint.lat, dataPoint.lng]);
+            // Create a polyline from all locations...
+            const latlngs = allData.slice().map(dataPoint => [dataPoint.lat, dataPoint.lng]);
             const polyline = L.polyline(latlngs, { color: 'blue' }).addTo(map);
             // Zoom the map to fit the polyline...
             map.fitBounds(polyline.getBounds());
@@ -72,10 +72,10 @@ async function loadJsonData() {
         const currentData = allData[allData.length - 1];
 
         //only update marker and view if first load or location has changed...
-        const markerLocation = marker.getLatLng();
+        const markerLocation = dMarker.getLatLng();
         if ((firstLoad) || (markerLocation.lat != currentData.lat) || (markerLocation.lng != currentData.lng)) {
             firstLoad = false;
-            marker.setLatLng([currentData.lat, currentData.lng]);
+            dMarker.setLatLng([currentData.lat, currentData.lng]);
             map.setView([currentData.lat, currentData.lng], map.getZoom(), {
                 animate: true,
                 pan: {
