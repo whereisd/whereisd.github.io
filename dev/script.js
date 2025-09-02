@@ -30,13 +30,11 @@ map.setView([0, 0], 17);
 // }).addTo(map);
 
 // *****Mapbox Standard *****
-// https://api.mapbox.com/styles/v1/YOUR_MAPBOX_USERNAME/YOUR_STYLE_ID/tiles/256/{z}/{x}/{y}?access_token=YOUR_MAPBOX_ACCESS_TOKEN
 L.tileLayer('https://api.mapbox.com/styles/v1/whereisd/cmf2t86hy00to01rk5gllbu6r/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1Ijoid2hlcmVpc2QiLCJhIjoiY21mMnQybm9rMDRmbTJrcTljcWg2NzViZCJ9.suwjyVDj4jKzzCW-DHwDbA', {
 	maxZoom: 19,
-	attribution: '<a href="https://www.mapbox.com/about/maps/">Mapbox</a>'
+	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://www.mapbox.com/about/maps/">Mapbox</a> <strong><a href="https://labs.mapbox.com/contribute/" target="_blank">Improve this map</a></strong>'
 }).addTo(map);
-
-
+map.resize();
 const info = L.control({ position: 'topright' });
 
 info.onAdd = function (map) {
