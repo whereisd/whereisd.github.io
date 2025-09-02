@@ -59,7 +59,7 @@ async function loadJsonData() {
                 let ptMarker = L.marker([dataPoint.lat, dataPoint.lng], { icon: L.divIcon({html: `<h1>${(i + 1)}</h1>`}) }).addTo(map);
                 const utcDate = new Date(dataPoint.dt);
                 const localTimeString = utcDate.toLocaleString();
-                ptMarker.bindTooltip(`<b>${localTimeString}</b><br>Elevation: ${Math.round(dataPoint.el)}`);
+                ptMarker.bindTooltip(`<b>${localTimeString}</b><br>Elevation: ${Math.round(dataPoint.el)} ft`);
             }
             // Create a polyline from all locations...
             const latlngs = allData.slice().map(dataPoint => [dataPoint.lat, dataPoint.lng]);
@@ -79,7 +79,7 @@ async function loadJsonData() {
         if ((firstLoad) || (markerLocation.lat != currentData.lat) || (markerLocation.lng != currentData.lng)) {
             firstLoad = false;
             dMarker.setLatLng([currentData.lat, currentData.lng]);
-            dMarker.bindTooltip(`<b>${localTimeString}</b><br>Elevation: ${Math.round(currentData.el)}`);
+            dMarker.bindTooltip(`<b>${localTimeString}</b><br>Elevation: ${Math.round(currentData.el)} ft`);
             map.setView([currentData.lat, currentData.lng], map.getZoom(), {
                 animate: true,
                 pan: {
