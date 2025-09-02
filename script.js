@@ -52,8 +52,7 @@ async function loadJsonData() {
         const response = await fetch('data.js', { cache: 'no-store' });
         const allData = await response.json();
 
-        if(firstLoad) {
-
+        if(false) {
             //Add the previous locations as markers...
             for (let i = 0; i < allData.length - 1; i++) {
                 const dataPoint = allData[i];
