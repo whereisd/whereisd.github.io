@@ -146,7 +146,7 @@ function drawRoute(allData) {
     const allPoints = allData.slice().map(dataPoint => [dataPoint.lng, dataPoint.lat]);
 
     // Mapbox Directions API limits the number of waypoints in a single request to 25, so chunk the requests...
-    chunkedPoints = chunkArray(allPoints, 25);
+    chunkedPoints = chunkArray(allPoints, 4);
 
     for (let i = 0; i <= chunkedPoints.length; i++) {
         const pointStrings = chunkedPoints.map(point => point.join(','));
