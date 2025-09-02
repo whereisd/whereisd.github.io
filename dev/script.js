@@ -148,7 +148,7 @@ function drawRoute(allData) {
     // Mapbox Directions API limits the number of waypoints in a single request to 25, so chunk the requests...
     chunkedPoints = chunkArray(allPoints, 25);
 
-    for (let i = 0; i < chunkedPoints.length; i++) {
+    for (let i = 0; i <= chunkedPoints.length; i++) {
         const pointStrings = chunkedPoints.map(point => point.join(','));
         const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${pointStrings.join(';')}?geometries=geojson&access_token=${MAPBOX_ACCESS_TOKEN}`;
 
@@ -160,7 +160,6 @@ function drawRoute(allData) {
             const route = data.routes[0].geometry;
             const coords = route.coordinates.map(c => [c[1], c[0]]);
             const line = L.polyline(coords, { color: '#f60', weight: 4 }).addTo(map);
-            //map.fitBounds(line.getBounds());
         });    
     }
 }
