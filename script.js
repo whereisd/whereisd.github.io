@@ -59,6 +59,11 @@ async function loadJsonData() {
                 console.log(JSON.stringify(dataPoint));
                 L.marker([dataPoint.lat, dataPoint.lng], { icon: L.divIcon({html: '<h1>' + (i + 1) + '</h1>'}) }).addTo(map);
             }
+            // Create a polyline from the previous locations...
+            const latlngs = allData.slice(0, -1).map(dataPoint => [dataPoint.lat, dataPoint.lng]);
+            const polyline = L.polyline(latlngs, { color: 'blue' }).addTo(map);
+            // Zoom the map to fit the polyline...
+            map.fitBounds(polyline.getBounds());
         }
         
         //get the most recent data point...
