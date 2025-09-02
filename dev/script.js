@@ -66,12 +66,12 @@ async function loadJsonData() {
         const utcDate = new Date(currentData.dt);
         const localTimeString = utcDate.toLocaleString();
         document.getElementById("last-date-time").innerText = "(" + localTimeString + ")";
-        
+
         //only update markers and view if first load or location has changed...
         if ((dMarker.getLatLng().lat != currentData.lat) || (dMarker.getLatLng().lng != currentData.lng)) {
             //clear markers and polylines...
             map.eachLayer(function (layer) {
-                if (layer instanceof L.Marker) {
+                if ((layer instanceof L.Marker) && (layer !== dMarker)) {
                     map.removeLayer(layer);
                 }
                 if (layer instanceof L.Polyline) {
