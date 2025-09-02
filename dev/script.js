@@ -144,22 +144,33 @@ function drawRoute(allData) {
     if (allData.length < 2) return; // Need at least two points to draw a route
 
     const allPoints = allData.slice().map(dataPoint => [dataPoint.lat, dataPoint.lng]);
-    //const polyline = L.polyline(latlngs, { color: '#f60' }).addTo(map);
-    
-    const pointStrings = allPoints.map(point => point.join(','));
 
-    const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${pointStrings.join(';')}?geometries=geojson&access_token=${MAPBOX_ACCESS_TOKEN}`;
+    // Mapbox Directions API limits the number of waypoints in a single request to 25, so chunk the requests...
+    chunkedPoints = chunkArray(allPoints, 25);
 
-    fetch(url)
-      .then(r => r.json())
-      .then(data => {
-        if (!data.routes || !data.routes.length) return;
+    for (let i = 0; i < chunkedPoints.length; i++) {
+        const pointStrings = chunkedPoints.map(point => point.join(','));
+        const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${pointStrings.join(';')}?geometries=geojson&access_token=${MAPBOX_ACCESS_TOKEN}`;
 
-        const route = data.routes[0].geometry; // GeoJSON LineString
-        const coords = route.coordinates.map(c => [c[1], c[0]]); // Leaflet [lat,lng]
-        const line = L.polyline(coords, { color: '#f60', weight: 4 }).addTo(map);
-        map.fitBounds(line.getBounds());
-      });
+        fetch(url)
+        .then(r => r.json())
+        .then(data => {
+            if (!data.routes || !data.routes.length) return;
+
+            const route = data.routes[0].geometry;
+            const coords = route.coordinates.map(c => [c[1], c[0]]);
+            const line = L.polyline(coords, { color: '#f60', weight: 4 }).addTo(map);
+            //map.fitBounds(line.getBounds());
+        });    
+    }
+}
+
+function chunkArray(arr, chunkSize) {
+  const result = [];
+  for (let i = 0; i < arr.length; i += chunkSize) {
+    result.push(arr.slice(i, i + chunkSize));
+  }
+  return result;
 }
 
 // Call updateCountdown initially to display the starting time
