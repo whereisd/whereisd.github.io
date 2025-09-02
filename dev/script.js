@@ -147,9 +147,8 @@ function drawRoute(allData) {
     //const polyline = L.polyline(latlngs, { color: '#f60' }).addTo(map);
     
     const pointStrings = allPoints.map(point => point.join(','));
-    const allPoints = pointStrings.join(';');
 
-    const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${allPoints}?geometries=geojson&access_token=${MAPBOX_ACCESS_TOKEN}`;
+    const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${pointStrings.join(';')}?geometries=geojson&access_token=${MAPBOX_ACCESS_TOKEN}`;
 
     fetch(url)
       .then(r => r.json())
