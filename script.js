@@ -71,11 +71,17 @@ async function loadJsonData() {
         //get the most recent data point...
         const currentData = allData[allData.length - 1];
 
+        //update the date/time display...
+        const utcDate = new Date(currentData.dt);
+        const localTimeString = utcDate.toLocaleString();
+        document.getElementById("last-date-time").innerText = "(" + localTimeString + ")";
+
         //only update marker and view if first load or location has changed...
         const markerLocation = dMarker.getLatLng();
         if ((firstLoad) || (markerLocation.lat != currentData.lat) || (markerLocation.lng != currentData.lng)) {
             firstLoad = false;
             dMarker.setLatLng([currentData.lat, currentData.lng]);
+            dMarker.bindTooltip(`<b>${localTimeString}</b>`);
             map.setView([currentData.lat, currentData.lng], map.getZoom(), {
                 animate: true,
                 pan: {
@@ -83,10 +89,6 @@ async function loadJsonData() {
                 }
             });
         }
-   
-        const utcDate = new Date(currentData.dt);
-        const localTimeString = utcDate.toLocaleString();
-        document.getElementById("last-date-time").innerText = "(" + localTimeString + ")";
     } catch (error) {
         console.error('Error fetching JSON:', error);
     }
