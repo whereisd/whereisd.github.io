@@ -51,6 +51,16 @@ async function loadJsonData() {
     try {
         const response = await fetch('data.js', { cache: 'no-store' });
         const allData = await response.json();
+
+        //Add the previous locations as a polyline...
+        const latlngs = allData.map(dataPoint => [dataPoint.lat, dataPoint.lng]);
+        if (latlngs.length > 1) {
+            const polyline = L.polyline(latlngs, { color: 'blue' }).addTo(map);
+            // Zoom the map to the polyline
+            map.fitBounds(polyline.getBounds());
+        }
+
+        //get the most recent data point...
         const currentData = allData[allData.length - 1];
 
         //only update marker and view if first load or location has changed...
