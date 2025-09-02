@@ -63,7 +63,7 @@ async function loadJsonData() {
             }
             // Create a polyline from all locations...
             const latlngs = allData.slice().map(dataPoint => [dataPoint.lat, dataPoint.lng]);
-            const polyline = L.polyline(latlngs, { color: 'blue' }).addTo(map);
+            const polyline = L.polyline(latlngs, { color: '#f60' }).addTo(map);
             // Zoom the map to fit the polyline...
             map.fitBounds(polyline.getBounds());
         }
