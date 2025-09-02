@@ -30,7 +30,7 @@ map.setView([0, 0], 17);
 // }).addTo(map);
 
 // *****Mapbox Standard *****
-L.tileLayer('https://api.mapbox.com/styles/v1/whereisd/cmf2t86hy00to01rk5gllbu6r/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1Ijoid2hlcmVpc2QiLCJhIjoiY21mMnQybm9rMDRmbTJrcTljcWg2NzViZCJ9.suwjyVDj4jKzzCW-DHwDbA', {
+L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoid2hlcmVpc2QiLCJhIjoiY21mMnQybm9rMDRmbTJrcTljcWg2NzViZCJ9.suwjyVDj4jKzzCW-DHwDbA', {
 	maxZoom: 19,
 	attribution: '<a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map);
