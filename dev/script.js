@@ -1,4 +1,6 @@
 
+
+const MAPBOX_ACCESS_TOKEN = "pk.eyJ1Ijoid2hlcmVpc2QiLCJhIjoiY21mMnQybm9rMDRmbTJrcTljcWg2NzViZCJ9.suwjyVDj4jKzzCW-DHwDbA"
 const map = L.map("map");
 map.setView([0, 0], 17);
 
@@ -31,7 +33,7 @@ map.setView([0, 0], 17);
 
 // *****Mapbox Standard *****
   'https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/256/{z}/{x}/{y}?access_token=YOUR_MAPBOX_ACCESS_TOKEN',
-L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1Ijoid2hlcmVpc2QiLCJhIjoiY21mMnQybm9rMDRmbTJrcTljcWg2NzViZCJ9.suwjyVDj4jKzzCW-DHwDbA', {
+L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/256/{z}/{x}/{y}?access_token=' + MAPBOX_ACCESS_TOKEN, {
 	maxZoom: 19,
 	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://www.mapbox.com/about/maps/">Mapbox</a> <strong><a href="https://labs.mapbox.com/contribute/" target="_blank">Improve this map</a></strong>'
 }).addTo(map);
@@ -98,9 +100,7 @@ async function loadJsonData() {
                 ptMarker.bindTooltip(`<b>${localTimeString}</b><br>Elevation: ${Math.round(dataPoint.el)} ft`);
             }
 
-            // Create a polyline from all locations...
-            const latlngs = allData.slice().map(dataPoint => [dataPoint.lat, dataPoint.lng]);
-            const polyline = L.polyline(latlngs, { color: '#f60' }).addTo(map);
+            drawRoute(allData);
         }
     } catch (error) {
         console.error('Error fetching JSON:', error);
@@ -140,16 +140,16 @@ function updateCountdown() {
     }
 }
 
-function drawRoute() {
-    // 2) Define origin/destination (lng,lat). Use trailhead coordinates for hiking.
-    const origin = [-122.435398, 37.774407];
-    const destination = [-122.424098, 37.765570];
+function drawRoute(allData) {
+    if (allData.length < 2) return; // Need at least two points to draw a route
 
-    // 3) Call Mapbox Directions API with walking profile
-    const url =
-      'https://api.mapbox.com/directions/v5/mapbox/walking/' +
-      origin.join(',') + ';' + destination.join(',') +
-      '?geometries=geojson&access_token=' + accessToken;
+    const allPoints = allData.slice().map(dataPoint => [dataPoint.lat, dataPoint.lng]);
+    //const polyline = L.polyline(latlngs, { color: '#f60' }).addTo(map);
+    
+    const pointStrings = allPoints.map(point => point.join(','));
+    const allPoints = pointStrings.join(';');
+
+    const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${allPoints}?geometries=geojson&access_token=${MAPBOX_ACCESS_TOKEN}`;
 
     fetch(url)
       .then(r => r.json())
@@ -158,14 +158,8 @@ function drawRoute() {
 
         const route = data.routes[0].geometry; // GeoJSON LineString
         const coords = route.coordinates.map(c => [c[1], c[0]]); // Leaflet [lat,lng]
-
-        // 4) Draw the route
-        const line = L.polyline(coords, { color: '#007cbf', weight: 4 }).addTo(map);
+        const line = L.polyline(coords, { color: '#f60', weight: 4 }).addTo(map);
         map.fitBounds(line.getBounds());
-
-        // Optional markers
-        L.marker([origin[1], origin[0]]).addTo(map).bindPopup('Start');
-        L.marker([destination[1], destination[0]]).addTo(map).bindPopup('End');
       });
 }
 
