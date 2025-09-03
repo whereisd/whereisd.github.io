@@ -174,7 +174,7 @@ function drawRoute(allData) {
         .then(data => {
             if (!data.matchings || !data.matchings.length) return;
 
-            matchings.forEach(match => {
+            data.matchings.forEach(match => {
                 const coords = match.geometry.coordinates.map(c => [c[1], c[0]]);
                 const line = L.polyline(coords, { color: '#f60', weight: 4 }).addTo(map); 
             });
