@@ -146,39 +146,39 @@ function drawRoute(allData) {
     const allPoints = allData.slice().map(dataPoint => [dataPoint.lng, dataPoint.lat]);
 
     // Mapbox Directions API limits the number of waypoints in a single request to 25, so chunk the requests...
-    // chunkedPoints = chunkArray(allPoints, 25);
+    chunkedPoints = chunkArray(allPoints, 25);
 
-    // for (let i = 0; i < chunkedPoints.length; i++) {
-    //     const pointsString = convert2DArrayToString(chunkedPoints[i]); 
-    //     const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${pointsString}?geometries=geojson&access_token=${MAPBOX_ACCESS_TOKEN}`;
-
-    //     fetch(url)
-    //     .then(r => r.json())
-    //     .then(data => {
-    //         if (!data.routes || !data.routes.length) return;
-
-    //         const route = data.routes[0].geometry;
-    //         const coords = route.coordinates.map(c => [c[1], c[0]]);
-    //         const line = L.polyline(coords, { color: '#f60', weight: 4 }).addTo(map);
-    //     });    
-    // }
-
-    // Mapbox Matching API limits the number of waypoints in a single request to 100, so chunk the requests...
-    chunkedPoints = chunkArray(allPoints, 100);
     for (let i = 0; i < chunkedPoints.length; i++) {
         const pointsString = convert2DArrayToString(chunkedPoints[i]); 
-        const url = `https://api.mapbox.com/matching/v5/mapbox/walking/${pointsString}?geometries=geojson&access_token=${MAPBOX_ACCESS_TOKEN}`;
+        const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${pointsString}?geometries=geojson&access_token=${MAPBOX_ACCESS_TOKEN}`;
 
         fetch(url)
         .then(r => r.json())
         .then(data => {
-            if (!data.matchings || !data.matchings.length) return;
+            if (!data.routes || !data.routes.length) return;
 
-            const matching = data.matchings[0].geometry;
-            const coords = matching.coordinates.map(c => [c[1], c[0]]);
+            const route = data.routes[0].geometry;
+            const coords = route.coordinates.map(c => [c[1], c[0]]);
             const line = L.polyline(coords, { color: '#f60', weight: 4 }).addTo(map);
         });    
     }
+
+    // Mapbox Matching API limits the number of waypoints in a single request to 100, so chunk the requests...
+    // chunkedPoints = chunkArray(allPoints, 100);
+    // for (let i = 0; i < chunkedPoints.length; i++) {
+    //     const pointsString = convert2DArrayToString(chunkedPoints[i]); 
+    //     const url = `https://api.mapbox.com/matching/v5/mapbox/walking/${pointsString}?geometries=geojson&access_token=${MAPBOX_ACCESS_TOKEN}`;
+
+    //     fetch(url)
+    //     .then(r => r.json())
+    //     .then(data => {
+    //         if (!data.matchings || !data.matchings.length) return;
+
+    //         const matching = data.matchings[0].geometry;
+    //         const coords = matching.coordinates.map(c => [c[1], c[0]]);
+    //         const line = L.polyline(coords, { color: '#f60', weight: 4 }).addTo(map);
+    //     });    
+    // }
 }
 
 function chunkArray(arr, chunkSize) {
