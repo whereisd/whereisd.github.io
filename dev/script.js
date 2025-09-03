@@ -150,7 +150,7 @@ function drawRoute(allData) {
 
     for (let i = 0; i < chunkedPoints.length; i++) {
         const pointsString = convert2DArrayToString(chunkedPoints[i]);
-        const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${pointsString}?geometries=geojson&continue_straight=true&access_token=${MAPBOX_ACCESS_TOKEN}`;
+        const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${pointsString}?geometries=geojson&access_token=${MAPBOX_ACCESS_TOKEN}`;
 
         fetch(url)
         .then(r => r.json())
