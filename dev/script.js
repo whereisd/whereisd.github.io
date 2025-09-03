@@ -26,16 +26,17 @@ map.setView([0, 0], 17);
 // }).addTo(map);
 
 // *****OpenStreetMap Standard *****
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-	maxZoom: 19,
-	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(map);
+// L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+// 	maxZoom: 19,
+// 	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+// }).addTo(map);
 
 // *****Mapbox Standard *****
-// L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/256/{z}/{x}/{y}?access_token=' + MAPBOX_ACCESS_TOKEN, {
-// 	maxZoom: 19,
-// 	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://www.mapbox.com/about/maps/">Mapbox</a> <strong><a href="https://labs.mapbox.com/contribute/" target="_blank">Improve this map</a></strong>'
-// }).addTo(map);
+  'https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/256/{z}/{x}/{y}?access_token=YOUR_MAPBOX_ACCESS_TOKEN',
+L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/256/{z}/{x}/{y}?access_token=' + MAPBOX_ACCESS_TOKEN, {
+	maxZoom: 19,
+	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://www.mapbox.com/about/maps/">Mapbox</a> <strong><a href="https://labs.mapbox.com/contribute/" target="_blank">Improve this map</a></strong>'
+}).addTo(map);
 
 const info = L.control({ position: 'topright' });
 
@@ -147,17 +148,32 @@ function drawRoute(allData) {
     // Mapbox Directions API limits the number of waypoints in a single request to 25, so chunk the requests...
     chunkedPoints = chunkArray(allPoints, 25);
 
-    for (let i = 0; i < chunkedPoints.length; i++) {
+    // for (let i = 0; i < chunkedPoints.length; i++) {
+    //     const pointsString = convert2DArrayToString(chunkedPoints[i]); 
+    //     const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${pointsString}?geometries=geojson&access_token=${MAPBOX_ACCESS_TOKEN}`;
+
+    //     fetch(url)
+    //     .then(r => r.json())
+    //     .then(data => {
+    //         if (!data.routes || !data.routes.length) return;
+
+    //         const route = data.routes[0].geometry;
+    //         const coords = route.coordinates.map(c => [c[1], c[0]]);
+    //         const line = L.polyline(coords, { color: '#f60', weight: 4 }).addTo(map);
+    //     });    
+    // }
+
+     for (let i = 0; i < chunkedPoints.length; i++) {
         const pointsString = convert2DArrayToString(chunkedPoints[i]); 
         const url = `https://api.mapbox.com/matching/v5/mapbox/walking/${pointsString}?geometries=geojson&access_token=${MAPBOX_ACCESS_TOKEN}`;
 
         fetch(url)
         .then(r => r.json())
         .then(data => {
-            if (!data.routes || !data.routes.length) return;
+            if (!data.matchings || !data.matchings.length) return;
 
-            const route = data.routes[0].geometry;
-            const coords = route.coordinates.map(c => [c[1], c[0]]);
+            const matching = data.matchings[0].geometry;
+            const coords = matching.coordinates.map(c => [c[1], c[0]]);
             const line = L.polyline(coords, { color: '#f60', weight: 4 }).addTo(map);
         });    
     }
