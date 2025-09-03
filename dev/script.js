@@ -1,6 +1,6 @@
 
 
-const MAPBOX_ACCESS_TOKEN = "pk.eyJ1Ijoid2hlcmVpc2QiLCJhIjoiY21mMnQybm9rMDRmbTJrcTljcWg2NzViZCJ9.suwjyVDj4jKzzCW-DHwDbA"
+const MAPBOX_ACCESS_TOKEN = "pk.eyJ1Ijoid2hlcmVpc2QiLCJhIjoiY21mMzkyeDF5MDlzMjJxb2hkOWQyMnQ5MSJ9.N_RtJqjsy8JiA8eE1HExjw"
 const map = L.map("map");
 map.setView([0, 0], 17);
 
