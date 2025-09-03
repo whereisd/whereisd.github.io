@@ -149,8 +149,8 @@ function drawRoute(allData) {
     chunkedPoints = chunkArray(allPoints, 25);
 
     for (let i = 0; i < chunkedPoints.length; i++) {
-        const pointStrings = chunkedPoints.map(point => point.join(','));
-        const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${pointStrings.join(';')}?geometries=geojson&continue_straight=true&access_token=${MAPBOX_ACCESS_TOKEN}`;
+        const pointsString = convert2DArrayToString(chunkedPoints[i]);
+        const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${pointsString}?geometries=geojson&continue_straight=true&access_token=${MAPBOX_ACCESS_TOKEN}`;
 
         fetch(url)
         .then(r => r.json())
@@ -170,6 +170,16 @@ function chunkArray(arr, chunkSize) {
     result.push(arr.slice(i, i + chunkSize));
   }
   return result;
+}
+
+function convert2DArrayToString(array2D) {
+  // Map each inner array to a string with comma-separated values
+  const innerStrings = array2D.map(innerArray => innerArray.join(','));
+
+  // Join the resulting strings with semicolons
+  const finalString = innerStrings.join(';');
+
+  return finalString;
 }
 
 // Call updateCountdown initially to display the starting time
