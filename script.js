@@ -1,4 +1,6 @@
-var firstLoad = true;
+
+
+const MAPBOX_ACCESS_TOKEN = "pk.eyJ1Ijoid2hlcmVpc2QiLCJhIjoiY21mMzkyeDF5MDlzMjJxb2hkOWQyMnQ5MSJ9.N_RtJqjsy8JiA8eE1HExjw"
 const map = L.map("map");
 map.setView([0, 0], 17);
 
@@ -24,9 +26,16 @@ map.setView([0, 0], 17);
 // }).addTo(map);
 
 // *****OpenStreetMap Standard *****
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+// L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+// 	maxZoom: 19,
+// 	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+// }).addTo(map);
+
+// *****Mapbox Standard *****
+  'https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/256/{z}/{x}/{y}?access_token=YOUR_MAPBOX_ACCESS_TOKEN',
+L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v12/tiles/256/{z}/{x}/{y}?access_token=' + MAPBOX_ACCESS_TOKEN, {
 	maxZoom: 19,
-	attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://www.mapbox.com/about/maps/">Mapbox</a> <strong><a href="https://labs.mapbox.com/contribute/" target="_blank">Improve this map</a></strong>'
 }).addTo(map);
 
 const info = L.control({ position: 'topright' });
@@ -51,20 +60,6 @@ async function loadJsonData() {
     try {
         const response = await fetch('data.js', { cache: 'no-store' });
         const allData = await response.json();
-
-        if(firstLoad) {
-            //Add the previous locations as markers...
-            for (let i = 0; i < allData.length - 1; i++) {
-                const dataPoint = allData[i];
-                let ptMarker = L.marker([dataPoint.lat, dataPoint.lng], { icon: L.divIcon({html: `<h1>${(i + 1)}</h1>`}) }).addTo(map);
-                const utcDate = new Date(dataPoint.dt);
-                const localTimeString = utcDate.toLocaleString();
-                ptMarker.bindTooltip(`<b>${localTimeString}</b><br>Elevation: ${Math.round(dataPoint.el)} ft`);
-            }
-            // Create a polyline from all locations...
-            const latlngs = allData.slice().map(dataPoint => [dataPoint.lat, dataPoint.lng]);
-            const polyline = L.polyline(latlngs, { color: '#f60' }).addTo(map);
-        }
         
         //get the most recent data point...
         const currentData = allData[allData.length - 1];
@@ -74,10 +69,19 @@ async function loadJsonData() {
         const localTimeString = utcDate.toLocaleString();
         document.getElementById("last-date-time").innerText = "(" + localTimeString + ")";
 
-        //only update marker and view if first load or location has changed...
-        const markerLocation = dMarker.getLatLng();
-        if ((firstLoad) || (markerLocation.lat != currentData.lat) || (markerLocation.lng != currentData.lng)) {
-            firstLoad = false;
+        //only update markers and view if first load or location has changed...
+        if ((dMarker.getLatLng().lat != currentData.lat) || (dMarker.getLatLng().lng != currentData.lng)) {
+            //clear markers and polylines...
+            map.eachLayer(function (layer) {
+                if ((layer instanceof L.Marker) && (layer !== dMarker)) {
+                    map.removeLayer(layer);
+                }
+                if (layer instanceof L.Polyline) {
+                    map.removeLayer(layer);
+                }
+            });
+
+            //Add dMarker
             dMarker.setLatLng([currentData.lat, currentData.lng]);
             dMarker.bindTooltip(`<b>${localTimeString}</b><br>Elevation: ${Math.round(currentData.el)} ft`);
             map.setView([currentData.lat, currentData.lng], map.getZoom(), {
@@ -86,6 +90,17 @@ async function loadJsonData() {
                     duration: 2
                 }
             });
+
+            //Add the previous locations as markers...
+            for (let i = 0; i < allData.length - 1; i++) {
+                const dataPoint = allData[i];
+                let ptMarker = L.marker([dataPoint.lat, dataPoint.lng], { icon: L.divIcon({html: `<h1>${(i + 1)}</h1>`}) }).addTo(map);
+                const utcDate = new Date(dataPoint.dt);
+                const localTimeString = utcDate.toLocaleString();
+                ptMarker.bindTooltip(`<b>${localTimeString}</b><br>Elevation: ${Math.round(dataPoint.el)} ft`);
+            }
+
+            drawRoute(allData);
         }
     } catch (error) {
         console.error('Error fetching JSON:', error);
@@ -123,6 +138,48 @@ function updateCountdown() {
         // Restart the countdown
         countdownInterval = setInterval(updateCountdown, 1000);
     }
+}
+
+function drawRoute(allData) {
+    if (allData.length < 2) return; // Need at least two points to draw a route
+
+    const allPoints = allData.slice().map(dataPoint => [dataPoint.lng, dataPoint.lat]);
+
+    // Mapbox Directions API limits the number of waypoints in a single request to 25, so chunk the requests...
+    const chunkedPoints = chunkArray(allPoints, 25);
+
+    for (let i = 0; i < chunkedPoints.length; i++) {
+        const pointsString = convert2DArrayToString(chunkedPoints[i]); 
+        const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${pointsString}?geometries=geojson&access_token=${MAPBOX_ACCESS_TOKEN}`;
+
+        fetch(url)
+        .then(r => r.json())
+        .then(data => {
+            if (!data.routes || !data.routes.length) return;
+
+            const route = data.routes[0].geometry;
+            const coords = route.coordinates.map(c => [c[1], c[0]]);
+            const line = L.polyline(coords, { color: '#f60', weight: 4 }).addTo(map);
+        });    
+    }
+}
+
+function chunkArray(arr, chunkSize) {
+  const result = [];
+  for (let i = 0; i < arr.length; i += chunkSize) {
+    result.push(arr.slice(i, i + chunkSize));
+  }
+  return result;
+}
+
+function convert2DArrayToString(array2D) {
+  // Map each inner array to a string with comma-separated values
+  const innerStrings = array2D.map(innerArray => innerArray.join(','));
+
+  // Join the resulting strings with semicolons
+  const finalString = innerStrings.join(';');
+
+  return finalString;
 }
 
 // Call updateCountdown initially to display the starting time
