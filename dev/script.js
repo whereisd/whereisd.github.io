@@ -174,27 +174,12 @@ function drawRoute(allData) {
         .then(data => {
             if (!data.matchings || !data.matchings.length) return;
 
-            const bestMatch = getHighestConfidenceMatch(data.matchings);
-
-            const matching = bestMatch.geometry;
-            const coords = matching.coordinates.map(c => [c[1], c[0]]);
-            const line = L.polyline(coords, { color: '#f60', weight: 4 }).addTo(map);
+            matchings.forEach(match => {
+                const coords = match.geometry.coordinates.map(c => [c[1], c[0]]);
+                const line = L.polyline(coords, { color: '#f60', weight: 4 }).addTo(map); 
+            });
         });    
     }
-}
-
-function getHighestConfidenceMatch(arr) {
-    // clone before sorting, to preserve the original array
-    var clone = arr.slice(0); 
-
-    // sort descending
-    clone.sort(function(x, y) {
-        if (x["confidence"] == y["confidence"]) return 0;
-        else if (parseFloat(x["confidence"]) < parseFloat(y["confidence"])) return 1;
-        else return -1;
-    });
-
-    return clone[0]
 }
 
 function chunkArray(arr, chunkSize) {
