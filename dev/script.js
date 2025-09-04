@@ -133,8 +133,17 @@ function addPreviousLocationMarkers(locations) {
         let ptMarker = L.marker([dataPoint.lat, dataPoint.lng], { icon: L.divIcon({html: `<h1>${(i + 1)}</h1>`}) }).addTo(map);
         const utcDate = new Date(dataPoint.dt);
         const localTimeString = utcDate.toLocaleString();
-        ptMarker.bindTooltip(`<b>${localTimeString}</b><br>Elevation: ${Math.round(dataPoint.el)} ft`);
+        ptMarker.bindTooltip(`<b>${localTimeString}</b><br>Elevation: ${getFormattedElevation(dataPoint.el)}`);
     }
+}
+
+function getFormattedElevation(elevationFeet) {
+    const elevationMeters = convertFeetToMeters(elevationFeet);
+    return `${Math.round(elevationFeet).toLocaleString()} ft (${Math.round(elevationMeters).toLocaleString()} m)`;
+}
+
+function convertFeetToMeters(feet) {
+    return feet * 0.3048;
 }
 
 function drawRoute(locations) {
