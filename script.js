@@ -42,7 +42,7 @@ const info = L.control({ position: 'topright' });
 
 info.onAdd = function (map) {
     this._div = L.DomUtil.create('div', 'info-box');
-    this._div.innerHTML = '<h2>Last known location</h2><h4 id="last-date-time" style="margin-bottom: 2px"></h4><div>Checking for update in <span id="next-update-countdown">5:00</span></div>';
+    this._div.innerHTML = '<h2>Last known location</h2><h4 id="last-date-time" style="margin-bottom: 2px"></h4><div id="status"></div>';
     return this._div;
 };
 
@@ -55,95 +55,101 @@ const markerIcon = L.icon({
 });
 
 const dMarker = L.marker([0, 0], { icon: markerIcon }).addTo(map);
+var countdownInterval;
 
 async function loadJsonData() {
     try {
         const response = await fetch('data.js', { cache: 'no-store' });
-        const allData = await response.json();
-        
-        //get the most recent data point...
-        const currentData = allData[allData.length - 1];
-
-        //update the date/time display...
-        const utcDate = new Date(currentData.dt);
-        const localTimeString = utcDate.toLocaleString();
-        document.getElementById("last-date-time").innerText = "(" + localTimeString + ")";
-
-        //only update markers and view if first load or location has changed...
-        if ((dMarker.getLatLng().lat != currentData.lat) || (dMarker.getLatLng().lng != currentData.lng)) {
-            //clear markers and polylines...
-            map.eachLayer(function (layer) {
-                if ((layer instanceof L.Marker) && (layer !== dMarker)) {
-                    map.removeLayer(layer);
-                }
-                if (layer instanceof L.Polyline) {
-                    map.removeLayer(layer);
-                }
-            });
-
-            //Add dMarker
-            dMarker.setLatLng([currentData.lat, currentData.lng]);
-            dMarker.bindTooltip(`<b>${localTimeString}</b><br>Elevation: ${Math.round(currentData.el)} ft`);
-            map.setView([currentData.lat, currentData.lng], map.getZoom(), {
-                animate: true,
-                pan: {
-                    duration: 2
-                }
-            });
-
-            //Add the previous locations as markers...
-            for (let i = 0; i < allData.length - 1; i++) {
-                const dataPoint = allData[i];
-                let ptMarker = L.marker([dataPoint.lat, dataPoint.lng], { icon: L.divIcon({html: `<h1>${(i + 1)}</h1>`}) }).addTo(map);
-                const utcDate = new Date(dataPoint.dt);
-                const localTimeString = utcDate.toLocaleString();
-                ptMarker.bindTooltip(`<b>${localTimeString}</b><br>Elevation: ${Math.round(dataPoint.el)} ft`);
+        const data = await response.json();
+        if (data) {
+            if(data.hikeEnded) {
+                clearInterval(countdownInterval);
+                document.getElementById("status").textContent = "Hike has ended.";
+            } else {
+                // Call updateCountdown initially to display the starting time
+                updateCountdown(); 
+                // Set up the interval to call updateCountdown every second
+                countdownInterval = setInterval(updateCountdown, 1000); 
             }
-
-            drawRoute(allData);
+            
+            updateUI(data.locations);
         }
     } catch (error) {
         console.error('Error fetching JSON:', error);
     }
 }
 
-// Set the initial countdown time in seconds (e.g., 5 minutes = 300 seconds)
-let totalSeconds = 300; 
+function updateUI(locations) {
+    if (!locations || locations.length === 0) return;
 
-// Get the HTML element where the timer will be displayed
-const timerDisplay = document.getElementById('next-update-countdown'); 
+    //get the most recent data point...
+    const currentData = locations[locations.length - 1];
 
-function updateCountdown() {
-    // Calculate minutes and seconds
-    let minutes = Math.floor(totalSeconds / 60);
-    let seconds = totalSeconds % 60;
+    updateInfoBox(currentData);
 
-    // Format minutes and seconds to always have two digits
-    minutes = minutes < 10 ? '0' + minutes : minutes;
-    seconds = seconds < 10 ? '0' + seconds : seconds;
+    //only update map if first load or location has changed...
+    if ((dMarker.getLatLng().lat != currentData.lat) || (dMarker.getLatLng().lng != currentData.lng)) {
+        clearPreviousLocationMarkers();
+        addDMarker(currentData);
+        addPreviousLocationMarkers(locations);
+        drawRoute(locations);
 
-    // Display the formatted time
-    timerDisplay.textContent = `${minutes}:${seconds}`;
-
-    // Decrease the total seconds
-    totalSeconds--;
-
-    // Stop the timer when it reaches zero
-    if (totalSeconds < 0) {
-        clearInterval(countdownInterval); // Stop the interval
-        timerDisplay.textContent = "";
-        // Reset the countdown for the next cycle
-        totalSeconds = 300; 
-        loadJsonData(); // Fetch new data
-        // Restart the countdown
-        countdownInterval = setInterval(updateCountdown, 1000);
+        map.setView([currentData.lat, currentData.lng], map.getZoom(), {
+            animate: true,
+            pan: {
+                duration: 2
+            }
+        });
     }
 }
 
-function drawRoute(allData) {
-    if (allData.length < 2) return; // Need at least two points to draw a route
+function updateInfoBox(currentData) {
+    const utcDate = new Date(currentData.dt);
+    const localTimeString = utcDate.toLocaleString();
+    document.getElementById("last-date-time").innerText = "(" + localTimeString + ")";
+}
 
-    const allPoints = allData.slice().map(dataPoint => [dataPoint.lng, dataPoint.lat]);
+function clearPreviousLocationMarkers() {
+    map.eachLayer(function (layer) {
+        if ((layer instanceof L.Marker) && (layer !== dMarker)) {
+            map.removeLayer(layer);
+        }
+        if (layer instanceof L.Polyline) {
+            map.removeLayer(layer);
+        }
+    });
+}
+
+function addDMarker(currentData) {
+    const utcDate = new Date(currentData.dt);
+    const localTimeString = utcDate.toLocaleString();
+    dMarker.setLatLng([currentData.lat, currentData.lng]);
+    dMarker.bindTooltip(`<b>${localTimeString}</b><br>Elevation: ${Math.round(currentData.el)} ft`);
+}
+
+function addPreviousLocationMarkers(locations) {
+    for (let i = 0; i < locations.length - 1; i++) {
+        const dataPoint = locations[i];
+        let ptMarker = L.marker([dataPoint.lat, dataPoint.lng], { icon: L.divIcon({html: `<h1>${(i + 1)}</h1>`}) }).addTo(map);
+        const utcDate = new Date(dataPoint.dt);
+        const localTimeString = utcDate.toLocaleString();
+        ptMarker.bindTooltip(`<b>${localTimeString}</b><br>Elevation: ${getFormattedElevation(dataPoint.el)}`);
+    }
+}
+
+function getFormattedElevation(elevationFeet) {
+    const elevationMeters = convertFeetToMeters(elevationFeet);
+    return `${Math.round(elevationFeet).toLocaleString()} ft (${Math.round(elevationMeters).toLocaleString()} m)`;
+}
+
+function convertFeetToMeters(feet) {
+    return feet * 0.3048;
+}
+
+function drawRoute(locations) {
+    if (locations.length < 2) return; // Need at least two points to draw a route
+
+    const allPoints = locations.slice().map(dataPoint => [dataPoint.lng, dataPoint.lat]);
 
     // Mapbox Directions API limits the number of waypoints in a single request to 25, so chunk the requests...
     const chunkedPoints = chunkArray(allPoints, 25);
@@ -164,6 +170,35 @@ function drawRoute(allData) {
     }
 }
 
+// Set the initial countdown time in seconds (e.g., 5 minutes = 300 seconds)
+let totalSeconds = 300; 
+
+function updateCountdown() {
+    let statusDisplay = document.getElementById('status');
+    // Calculate minutes and seconds
+    let minutes = Math.floor(totalSeconds / 60);
+    let seconds = totalSeconds % 60;
+
+    // Format minutes and seconds to always have two digits
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+    seconds = seconds < 10 ? '0' + seconds : seconds;
+
+    // Display the formatted time
+    statusDisplay.textContent = `Checking for update in ${minutes}:${seconds}`;
+
+    // Decrease the total seconds
+    totalSeconds--;
+
+    // Stop the timer when it reaches zero
+    if (totalSeconds < 0) {
+        clearInterval(countdownInterval); // Stop the interval
+        statusDisplay.textContent = "";
+        // Reset the countdown for the next cycle
+        totalSeconds = 300; 
+        loadJsonData(); // Fetch new data
+    }
+}
+
 function chunkArray(arr, chunkSize) {
   const result = [];
   for (let i = 0; i < arr.length; i += chunkSize) {
@@ -181,12 +216,6 @@ function convert2DArrayToString(array2D) {
 
   return finalString;
 }
-
-// Call updateCountdown initially to display the starting time
-updateCountdown(); 
-
-// Set up the interval to call updateCountdown every second
-let countdownInterval = setInterval(updateCountdown, 1000); 
 
 //initial data load
 document.addEventListener('DOMContentLoaded', loadJsonData);
