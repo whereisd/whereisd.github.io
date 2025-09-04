@@ -59,9 +59,13 @@ const dMarker = L.marker([0, 0], { icon: markerIcon }).addTo(map);
 async function loadJsonData() {
     try {
         const response = await fetch('data.js', { cache: 'no-store' });
-        const allData = await response.json();
-        updateUI(allData);
-        
+        const data = await response.json();
+        if (data) {
+            if(data.hikeEnded) {
+            } else {
+                updateUI(data.locations);
+            }
+        }
     } catch (error) {
         console.error('Error fetching JSON:', error);
     }
