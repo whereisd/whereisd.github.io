@@ -182,14 +182,6 @@ function convert2DArrayToString(array2D) {
   return finalString;
 }
 
-const core = require('@actions/core');
-
-function test() {
-    // Access a repository variable
-    const myVariable = core.getInput('MY_VARIABLE_NAME'); 
-    console.log(`My variable value: ${myVariable}`);
-}
-
 // Call updateCountdown initially to display the starting time
 updateCountdown(); 
 
