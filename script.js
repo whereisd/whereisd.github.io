@@ -59,7 +59,7 @@ var countdownInterval;
 
 async function loadJsonData() {
     try {
-        const response = await fetch('data.js', { cache: 'no-store' });
+        const response = await fetch('data.js', { cache: 'no-store', next: { revalidate: 0 } });
         const data = await response.json();
         if (data) {
             if(data.hikeEnded) {
