@@ -60,50 +60,92 @@ async function loadJsonData() {
     try {
         const response = await fetch('data.js', { cache: 'no-store' });
         const allData = await response.json();
+        updateUI(allData);
         
-        //get the most recent data point...
-        const currentData = allData[allData.length - 1];
-
-        //update the date/time display...
-        const utcDate = new Date(currentData.dt);
-        const localTimeString = utcDate.toLocaleString();
-        document.getElementById("last-date-time").innerText = "(" + localTimeString + ")";
-
-        //only update markers and view if first load or location has changed...
-        if ((dMarker.getLatLng().lat != currentData.lat) || (dMarker.getLatLng().lng != currentData.lng)) {
-            //clear markers and polylines...
-            map.eachLayer(function (layer) {
-                if ((layer instanceof L.Marker) && (layer !== dMarker)) {
-                    map.removeLayer(layer);
-                }
-                if (layer instanceof L.Polyline) {
-                    map.removeLayer(layer);
-                }
-            });
-
-            //Add dMarker
-            dMarker.setLatLng([currentData.lat, currentData.lng]);
-            dMarker.bindTooltip(`<b>${localTimeString}</b><br>Elevation: ${Math.round(currentData.el)} ft`);
-            map.setView([currentData.lat, currentData.lng], map.getZoom(), {
-                animate: true,
-                pan: {
-                    duration: 2
-                }
-            });
-
-            //Add the previous locations as markers...
-            for (let i = 0; i < allData.length - 1; i++) {
-                const dataPoint = allData[i];
-                let ptMarker = L.marker([dataPoint.lat, dataPoint.lng], { icon: L.divIcon({html: `<h1>${(i + 1)}</h1>`}) }).addTo(map);
-                const utcDate = new Date(dataPoint.dt);
-                const localTimeString = utcDate.toLocaleString();
-                ptMarker.bindTooltip(`<b>${localTimeString}</b><br>Elevation: ${Math.round(dataPoint.el)} ft`);
-            }
-
-            drawRoute(allData);
-        }
     } catch (error) {
         console.error('Error fetching JSON:', error);
+    }
+}
+
+function updateUI(allData) {
+    if (!allData || allData.length === 0) return;
+
+    //get the most recent data point...
+    const currentData = allData[allData.length - 1];
+
+    updateInfoBox(currentData);
+
+    //only update map if first load or location has changed...
+    if ((dMarker.getLatLng().lat != currentData.lat) || (dMarker.getLatLng().lng != currentData.lng)) {
+        clearPreviousLocationMarkers();
+        addDMarker(currentData);
+        addPreviousLocationMarkers(allData);
+        drawRoute(allData);
+
+        map.setView([currentData.lat, currentData.lng], map.getZoom(), {
+            animate: true,
+            pan: {
+                duration: 2
+            }
+        });
+    }
+}
+
+function updateInfoBox(currentData) {
+    const utcDate = new Date(currentData.dt);
+    const localTimeString = utcDate.toLocaleString();
+    document.getElementById("last-date-time").innerText = "(" + localTimeString + ")";
+}
+
+function clearPreviousLocationMarkers() {
+    map.eachLayer(function (layer) {
+        if ((layer instanceof L.Marker) && (layer !== dMarker)) {
+            map.removeLayer(layer);
+        }
+        if (layer instanceof L.Polyline) {
+            map.removeLayer(layer);
+        }
+    });
+}
+
+function addDMarker(currentData) {
+    const utcDate = new Date(currentData.dt);
+    const localTimeString = utcDate.toLocaleString();
+    dMarker.setLatLng([currentData.lat, currentData.lng]);
+    dMarker.bindTooltip(`<b>${localTimeString}</b><br>Elevation: ${Math.round(currentData.el)} ft`);
+}
+
+function addPreviousLocationMarkers(allData) {
+    for (let i = 0; i < allData.length - 1; i++) {
+        const dataPoint = allData[i];
+        let ptMarker = L.marker([dataPoint.lat, dataPoint.lng], { icon: L.divIcon({html: `<h1>${(i + 1)}</h1>`}) }).addTo(map);
+        const utcDate = new Date(dataPoint.dt);
+        const localTimeString = utcDate.toLocaleString();
+        ptMarker.bindTooltip(`<b>${localTimeString}</b><br>Elevation: ${Math.round(dataPoint.el)} ft`);
+    }
+}
+
+function drawRoute(allData) {
+    if (allData.length < 2) return; // Need at least two points to draw a route
+
+    const allPoints = allData.slice().map(dataPoint => [dataPoint.lng, dataPoint.lat]);
+
+    // Mapbox Directions API limits the number of waypoints in a single request to 25, so chunk the requests...
+    const chunkedPoints = chunkArray(allPoints, 25);
+
+    for (let i = 0; i < chunkedPoints.length; i++) {
+        const pointsString = convert2DArrayToString(chunkedPoints[i]); 
+        const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${pointsString}?geometries=geojson&access_token=${MAPBOX_ACCESS_TOKEN}`;
+
+        fetch(url)
+        .then(r => r.json())
+        .then(data => {
+            if (!data.routes || !data.routes.length) return;
+
+            const route = data.routes[0].geometry;
+            const coords = route.coordinates.map(c => [c[1], c[0]]);
+            const line = L.polyline(coords, { color: '#f60', weight: 4 }).addTo(map);
+        });    
     }
 }
 
@@ -137,30 +179,6 @@ function updateCountdown() {
         loadJsonData(); // Fetch new data
         // Restart the countdown
         countdownInterval = setInterval(updateCountdown, 1000);
-    }
-}
-
-function drawRoute(allData) {
-    if (allData.length < 2) return; // Need at least two points to draw a route
-
-    const allPoints = allData.slice().map(dataPoint => [dataPoint.lng, dataPoint.lat]);
-
-    // Mapbox Directions API limits the number of waypoints in a single request to 25, so chunk the requests...
-    const chunkedPoints = chunkArray(allPoints, 25);
-
-    for (let i = 0; i < chunkedPoints.length; i++) {
-        const pointsString = convert2DArrayToString(chunkedPoints[i]); 
-        const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${pointsString}?geometries=geojson&access_token=${MAPBOX_ACCESS_TOKEN}`;
-
-        fetch(url)
-        .then(r => r.json())
-        .then(data => {
-            if (!data.routes || !data.routes.length) return;
-
-            const route = data.routes[0].geometry;
-            const coords = route.coordinates.map(c => [c[1], c[0]]);
-            const line = L.polyline(coords, { color: '#f60', weight: 4 }).addTo(map);
-        });    
     }
 }
 
