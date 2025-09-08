@@ -139,7 +139,7 @@ function addPreviousLocationMarkers(locations) {
 
 function getToolTip(dataPoint) {
     const utcDate = new Date(dataPoint.dt);
-    const localTimeString = utcDate.toLocaleString();
+    const localTimeString = utcDate.toLocaleString([], {hour: '2-digit', minute:'2-digit'});
     return `<b>${localTimeString}</b>
         <br>
         Elevation: ${getFormattedElevation(dataPoint.el)}
