@@ -124,7 +124,7 @@ function addDMarker(currentData) {
     const utcDate = new Date(currentData.dt);
     const localTimeString = utcDate.toLocaleString();
     dMarker.setLatLng([currentData.lat, currentData.lng]);
-    dMarker.bindTooltip(`<b>${localTimeString}</b><br>Elevation: ${Math.round(currentData.el)} ft`);
+    dMarker.bindTooltip(getToolTip(currentData));
 }
 
 function addPreviousLocationMarkers(locations) {
@@ -133,9 +133,20 @@ function addPreviousLocationMarkers(locations) {
         let ptMarker = L.marker([dataPoint.lat, dataPoint.lng], { icon: L.divIcon({html: `<h1>${(i + 1)}</h1>`}) }).addTo(map);
         const utcDate = new Date(dataPoint.dt);
         const localTimeString = utcDate.toLocaleString();
-        ptMarker.bindTooltip(`<b>${localTimeString}</b><br>Elevation: ${getFormattedElevation(dataPoint.el)}`);
+        ptMarker.bindTooltip(getToolTip(dataPoint));
     }
 }
+
+getToolTip(dataPoint) {
+    const utcDate = new Date(dataPoint.dt);
+    const localTimeString = utcDate.toLocaleString();
+    return `<b>${localTimeString}</b>
+        <br>
+        Elevation: ${getFormattedElevation(dataPoint.el)}
+        <br>
+        Temperature: ${dataPoint.tmpF} °F`;
+}
+
 
 function getFormattedElevation(elevationFeet) {
     const elevationMeters = convertFeetToMeters(elevationFeet);
