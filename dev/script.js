@@ -104,9 +104,19 @@ function updateUI(locations) {
 }
 
 function updateInfoBox(currentData) {
-    const utcDate = new Date(currentData.dt);
-    const localTimeString = utcDate.toLocaleString();
-    document.getElementById("last-date-time").innerText = "(" + localTimeString + ")";
+    document.getElementById("last-date-time").innerText = "(" + getFormattedDateTimeString(currentData.dt) + ")";
+}
+
+function getFormattedDateTimeString(utcDateString) {
+    const utcDate = new Date(utcDateString);
+    return utcDate.toLocaleString([], {
+        year: "2-digit",
+        month: "numeric",
+        day: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        timeZoneName: "short",
+    });
 }
 
 function clearPreviousLocationMarkers() {
@@ -138,16 +148,7 @@ function addPreviousLocationMarkers(locations) {
 }
 
 function getToolTip(dataPoint) {
-    const utcDate = new Date(dataPoint.dt);
-    const localTimeString = utcDate.toLocaleString([], {
-        year: "2-digit",
-        month: "numeric",
-        day: "numeric",
-        hour: "numeric",
-        minute: "numeric",
-        timeZoneName: "short",
-    });
-    return `<b>${localTimeString}</b>
+    return `<b>${getFormattedDateTimeString(dataPoint.dt)}</b>
         <br>
         Elevation: ${getFormattedElevation(dataPoint.el)}
         <br>
