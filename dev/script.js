@@ -137,7 +137,7 @@ function addPreviousLocationMarkers(locations) {
     }
 }
 
-getToolTip(dataPoint) {
+function getToolTip(dataPoint) {
     const utcDate = new Date(dataPoint.dt);
     const localTimeString = utcDate.toLocaleString();
     return `<b>${localTimeString}</b>
