@@ -189,7 +189,8 @@ async function getRoutes(locations) {
 
         try {
             const response = await fetch(url);
-            routes.push(await response.json());
+            const data = await response.json();
+            routes.push(data);
         } catch (error) {
             console.error('Error fetching route:', error);
         }
