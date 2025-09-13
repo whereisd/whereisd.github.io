@@ -92,7 +92,7 @@ function updateUI(locations) {
         clearPreviousLocationMarkers();
         addDMarker(currentData);
         // Since mapbox directions API limits to 25 waypoints, getRoutes() will return an array of route segments...
-        const routesData = getRoutes(locations);
+        const routesData = await getRoutes(locations);
         // pass routeData and/or waypoints/distance from it to this...
         addPreviousLocationMarkers(locations);
         drawRoute(routesData);
