@@ -91,8 +91,11 @@ function updateUI(locations) {
     if ((dMarker.getLatLng().lat != currentData.lat) || (dMarker.getLatLng().lng != currentData.lng)) {
         clearPreviousLocationMarkers();
         addDMarker(currentData);
+        // Since mapbox directions API limits to 25 waypoints, getRoutes() will return an array of route segments...
+        const routesData = getRoutes(locations);
+        // pass routeData and/or waypoints/distance from it to this...
         addPreviousLocationMarkers(locations);
-        drawRoute(locations);
+        drawRoute(routesData);
 
         map.setView([currentData.lat, currentData.lng], map.getZoom(), {
             animate: true,
@@ -171,27 +174,36 @@ function metersToMiles(meters) {
   return meters / 1609.344;
 }
 
-function drawRoute(locations) {
-    if (locations.length < 2) return; // Need at least two points to draw a route
+async function getRoutes(locations) {
+    if (locations.length < 2) return []; // Need at least two points to draw a route
 
     const allPoints = locations.slice().map(dataPoint => [dataPoint.lng, dataPoint.lat]);
 
     // Mapbox Directions API limits the number of waypoints in a single request to 25, so chunk the requests...
     const chunkedPoints = chunkArray(allPoints, 25);
+    const routes = [];
 
     for (let i = 0; i < chunkedPoints.length; i++) {
         const pointsString = convert2DArrayToString(chunkedPoints[i]); 
         const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${pointsString}?geometries=geojson&waypoints_per_route=true&access_token=${MAPBOX_ACCESS_TOKEN}`;
 
-        fetch(url)
-        .then(r => r.json())
-        .then(data => {
-            if (!data.routes || !data.routes.length) return;
+        try {
+            const response = await fetch(url);
+            routes.push(await response.json());
+        } catch (error) {
+            console.error('Error fetching route:', error);
+        }
+    }
+    return routes;
+}
 
-            const route = data.routes[0].geometry;
-            const coords = route.coordinates.map(c => [c[1], c[0]]);
-            const line = L.polyline(coords, { color: '#f60', weight: 4 }).addTo(map);
-        });    
+function drawRoute(routesArray) {
+    for(const routeData of routesArray) {
+        if (!routeData.routes || !routeData.routes.length) return;
+
+        const route = routeData.routes[0].geometry;
+        const coords = route.coordinates.map(c => [c[1], c[0]]);
+        const line = L.polyline(coords, { color: '#f60', weight: 4 }).addTo(map);
     }
 }
 
