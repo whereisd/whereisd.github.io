@@ -152,17 +152,23 @@ function getToolTip(dataPoint) {
         <br>
         Elevation: ${getFormattedElevation(dataPoint.el)}
         <br>
+        Distance hiked: ${metersToMiles(dataPoint.distanceFromStart).toFixed(2)} miles
+        <br>
         Temperature: ${dataPoint.tmpF ? dataPoint.tmpF + " °F" : "No data" }`;
 }
 
 
 function getFormattedElevation(elevationFeet) {
-    const elevationMeters = convertFeetToMeters(elevationFeet);
+    const elevationMeters = feetToMeters(elevationFeet);
     return `${Math.round(elevationFeet).toLocaleString()} ft (${Math.round(elevationMeters).toLocaleString()} m)`;
 }
 
-function convertFeetToMeters(feet) {
+function feetToMeters(feet) {
     return feet * 0.3048;
+}
+
+function metersToMiles(meters) {
+  return meters / 1609.344;
 }
 
 function drawRoute(locations) {
