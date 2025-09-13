@@ -152,7 +152,7 @@ function getToolTip(dataPoint) {
         <br>
         Elevation: ${getFormattedElevation(dataPoint.el)}
         <br>
-        Temperature: ${dataPoint.tmpF} °F`;
+        Temperature: ${dataPoint.tmpF || "No data" } °F`;
 }
 
 
