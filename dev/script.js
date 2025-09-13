@@ -188,8 +188,8 @@ function getRoutes(locations) {
         const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${pointsString}?geometries=geojson&waypoints_per_route=true&access_token=${MAPBOX_ACCESS_TOKEN}`;
 
         try {
-            const response = await fetch(url);
-            const data = await response.json();
+            const response = fetch(url);
+            const data = response.json();
             routes.push(data);
         } catch (error) {
             console.error('Error fetching route:', error);
