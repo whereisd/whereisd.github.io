@@ -104,9 +104,19 @@ function updateUI(locations) {
 }
 
 function updateInfoBox(currentData) {
-    const utcDate = new Date(currentData.dt);
-    const localTimeString = utcDate.toLocaleString();
-    document.getElementById("last-date-time").innerText = "(" + localTimeString + ")";
+    document.getElementById("last-date-time").innerText = "(" + getFormattedDateTimeString(currentData.dt) + ")";
+}
+
+function getFormattedDateTimeString(utcDateString) {
+    const utcDate = new Date(utcDateString);
+    return utcDate.toLocaleString([], {
+        year: "2-digit",
+        month: "numeric",
+        day: "numeric",
+        hour: "numeric",
+        minute: "numeric",
+        timeZoneName: "short",
+    });
 }
 
 function clearPreviousLocationMarkers() {
@@ -124,7 +134,7 @@ function addDMarker(currentData) {
     const utcDate = new Date(currentData.dt);
     const localTimeString = utcDate.toLocaleString();
     dMarker.setLatLng([currentData.lat, currentData.lng]);
-    dMarker.bindTooltip(`<b>${localTimeString}</b><br>Elevation: ${Math.round(currentData.el)} ft`);
+    dMarker.bindTooltip(getToolTip(currentData));
 }
 
 function addPreviousLocationMarkers(locations) {
@@ -133,17 +143,30 @@ function addPreviousLocationMarkers(locations) {
         let ptMarker = L.marker([dataPoint.lat, dataPoint.lng], { icon: L.divIcon({html: `<h1>${(i + 1)}</h1>`}) }).addTo(map);
         const utcDate = new Date(dataPoint.dt);
         const localTimeString = utcDate.toLocaleString();
-        ptMarker.bindTooltip(`<b>${localTimeString}</b><br>Elevation: ${getFormattedElevation(dataPoint.el)}`);
+        ptMarker.bindTooltip(getToolTip(dataPoint));
     }
 }
 
+function getToolTip(dataPoint) {
+    return `<b>${getFormattedDateTimeString(dataPoint.dt)}</b>
+        <br>
+        Elevation: ${getFormattedElevation(dataPoint.el)}
+        <br>
+        Temperature: ${dataPoint.tmpF ? dataPoint.tmpF + " °F" : "No data" }`;
+}
+
+
 function getFormattedElevation(elevationFeet) {
-    const elevationMeters = convertFeetToMeters(elevationFeet);
+    const elevationMeters = feetToMeters(elevationFeet);
     return `${Math.round(elevationFeet).toLocaleString()} ft (${Math.round(elevationMeters).toLocaleString()} m)`;
 }
 
-function convertFeetToMeters(feet) {
+function feetToMeters(feet) {
     return feet * 0.3048;
+}
+
+function metersToMiles(meters) {
+  return meters / 1609.344;
 }
 
 function drawRoute(locations) {
@@ -156,7 +179,7 @@ function drawRoute(locations) {
 
     for (let i = 0; i < chunkedPoints.length; i++) {
         const pointsString = convert2DArrayToString(chunkedPoints[i]); 
-        const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${pointsString}?geometries=geojson&access_token=${MAPBOX_ACCESS_TOKEN}`;
+        const url = `https://api.mapbox.com/directions/v5/mapbox/walking/${pointsString}?geometries=geojson&waypoints_per_route=true&access_token=${MAPBOX_ACCESS_TOKEN}`;
 
         fetch(url)
         .then(r => r.json())
