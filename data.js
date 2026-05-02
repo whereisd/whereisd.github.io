@@ -1,1 +1,1 @@
-{"locations":[],"sha":"bbf328ef0875bca7effd05189e35184f62d60712","hikeEnded":true}
+{"locations":[{"lat":"33.81308","lng":"-116.63828","dt":"2026-05-02T15:08:30.000Z","el":8417.353060888672,"tmpF":50.79}],"sha":"281450f98f59f561a0d384fdcbabb1d1fef92f30","hikeEnded":false}
